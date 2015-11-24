@@ -1,0 +1,5 @@
+golang-json-patch (1.0+git20150402+766277e-1) trusty; urgency=low
+
+  * Initial release 
+
+ -- Joachim Bauch <bauch@struktur.de>  Tue, 24 Nov 2015 10:14:56 +0100
