@@ -121,6 +121,26 @@ var Cases = []Case{
 		`[ { "op": "remove", "path": "/qux/bar" } ]`,
 		`{ "foo": "bar", "qux": { "baz": 1 } }`,
 	},
+	{
+		`{ "foo": "bar" }`,
+		`[ { "op": "add", "path": "/baz", "value": null } ]`,
+		`{ "baz": null, "foo": "bar" }`,
+	},
+	{
+		`{ "foo": ["bar"]}`,
+		`[ { "op": "replace", "path": "/foo/0", "value": "baz"}]`,
+		`{ "foo": ["baz"]}`,
+	},
+	{
+		`{ "foo": ["bar","baz"]}`,
+		`[ { "op": "replace", "path": "/foo/0", "value": "bum"}]`,
+		`{ "foo": ["bum","baz"]}`,
+	},
+	{
+		`{ "foo": ["bar","qux","baz"]}`,
+		`[ { "op": "replace", "path": "/foo/1", "value": "bum"}]`,
+		`{ "foo": ["bar", "bum","baz"]}`,
+	},
 }
 
 type BadCase struct {
@@ -132,12 +152,32 @@ var MutationTestCases = []BadCase{
 		`{ "foo": "bar", "qux": { "baz": 1, "bar": null } }`,
 		`[ { "op": "remove", "path": "/qux/bar" } ]`,
 	},
+	{
+		`{ "foo": "bar", "qux": { "baz": 1, "bar": null } }`,
+		`[ { "op": "replace", "path": "/qux/baz", "value": null } ]`,
+	},
 }
 
 var BadCases = []BadCase{
 	{
 		`{ "foo": "bar" }`,
 		`[ { "op": "add", "path": "/baz/bat", "value": "qux" } ]`,
+	},
+	{
+		`{ "a": { "b": { "d": 1 } } }`,
+		`[ { "op": "remove", "path": "/a/b/c" } ]`,
+	},
+	{
+		`{ "a": { "b": { "d": 1 } } }`,
+		`[ { "op": "move", "from": "/a/b/c", "path": "/a/b/e" } ]`,
+	},
+	{
+		`{ "a": { "b": [1] } }`,
+		`[ { "op": "remove", "path": "/a/b/1" } ]`,
+	},
+	{
+		`{ "a": { "b": [1] } }`,
+		`[ { "op": "move", "from": "/a/b/1", "path": "/a/b/2" } ]`,
 	},
 }
 
