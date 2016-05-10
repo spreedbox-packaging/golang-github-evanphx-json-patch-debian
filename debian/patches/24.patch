@@ -1,0 +1,52 @@
+From a36314897cba1e87f33aa99057ee8cd262dbf4fa Mon Sep 17 00:00:00 2001
+From: Simon Eisenmann <simon@struktur.de>
+Date: Tue, 10 May 2016 11:19:06 +0200
+Subject: [PATCH] Fix merge of existing array to empty array (was resulting in
+ null, now results in empty array).
+
+---
+ merge.go      |  2 +-
+ merge_test.go | 17 +++++++++++++++++
+ 2 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/merge.go b/merge.go
+index a500c1b..2838784 100644
+--- a/merge.go
++++ b/merge.go
+@@ -69,7 +69,7 @@ func pruneDocNulls(doc *partialDoc) *partialDoc {
+ }
+ 
+ func pruneAryNulls(ary *partialArray) *partialArray {
+-	var newAry []*lazyNode
++	newAry := []*lazyNode{}
+ 
+ 	for _, v := range *ary {
+ 		if v != nil {
+diff --git a/merge_test.go b/merge_test.go
+index b2bc6de..8604417 100644
+--- a/merge_test.go
++++ b/merge_test.go
+@@ -107,6 +107,23 @@ func TestMergePatchReturnsErrorOnBadJSON(t *testing.T) {
+ 	}
+ }
+ 
++func TestMergePatchReturnsEmptyArrayOnEmptyArray(t *testing.T) {
++	doc := `{ "array": ["one", "two"] }`
++	pat := `{ "array": [] }`
++
++	exp := `{ "array": [] }`
++
++	res, err := MergePatch([]byte(doc), []byte(pat))
++
++	if err != nil {
++		t.Errorf("Unexpected error: %s, %s", err, string(res))
++	}
++
++	if !compareJSON(exp, string(res)) {
++		t.Fatalf("Emtpy array did not return not return as empty array")
++	}
++}
++
+ var rfcTests = []struct {
+ 	target   string
+ 	patch    string
